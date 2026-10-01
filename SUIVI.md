@@ -14,6 +14,7 @@
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
+**13** Pastille orange : l'accès du script était « Anyone with a Google Account » ; passé à « Anyone », envoi vérifié depuis la page publiée en M8
 **5** Application publiée sur https://mmmathieu77.github.io/brouillard/ en M5
 **6** Hébergement : GitHub Pages, dépôt public `mmmathieu77/brouillard` · décidé en M5
 **4** Google Sheet créé, script déployé, réponse « Brouillard est prêt » confirmée par Mathieu en M4
