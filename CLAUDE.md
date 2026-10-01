@@ -14,6 +14,11 @@ Application web installable sur téléphone : un gradateur de 0 à 10, un bouton
 - Toute mesure est d'abord écrite localement, puis envoyée. Une mesure n'est jamais perdue faute de réseau.
 - Après un changement dans `app/`, incrémenter `CACHE` dans `app/sw.js`.
 
+## Publication
+
+- Dépôt `mmmathieu77/brouillard` (public), page servie sur https://mmmathieu77.github.io/brouillard/ depuis la branche `gh-pages`.
+- Publier une mise à jour : commit sur `main`, `git push`, puis `git subtree push --prefix app origin gh-pages`.
+
 ## Suivi
 
 Registre des points : `SUIVI.md`.
