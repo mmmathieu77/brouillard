@@ -115,7 +115,7 @@ const ecrire = (cle, v) => { try { localStorage.setItem(cle, JSON.stringify(v));
 
 let cfg = { url: '', pas: 1, raccourci: '', ...lire(CLE_CFG, {}) };
 let mesures = lire(CLE_MESURES, []);   // { id, iso, valeur, note, envoye }
-let envoiEnCours = false;
+let envoiEnCours = false, erreurEnvoi = '';
 
 // Heure locale exacte avec décalage, ex. 2026-10-01T09:18:42.123-04:00
 function isoLocal(d) {
@@ -151,7 +151,8 @@ function afficher() {
   }
   const attente = mesures.filter(m => !m.envoye).length;
   $('etat').textContent = !cfg.url ? 'Google Sheet non configuré (⚙︎). Les mesures restent sur le téléphone.'
-    : attente ? `${attente} mesure${attente > 1 ? 's' : ''} en attente d’envoi`
+    : !/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(cfg.url) ? 'L’adresse du script doit commencer par https://script.google.com/macros/s/ et finir par /exec (⚙︎)'
+    : attente ? `${attente} mesure${attente > 1 ? 's' : ''} en attente d’envoi` + (erreurEnvoi ? ` · ${erreurEnvoi}` : '')
     : mesures.length ? 'Tout est dans le Google Sheet' : '';
 }
 
@@ -167,14 +168,20 @@ async function synchroniser() {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ id: m.id, iso: m.iso, valeur: m.valeur, note: m.note || '' }),
       });
-      const rep = await r.json();
+      const texte = await r.text();
+      let rep;
+      try { rep = JSON.parse(texte); } catch { throw new Error(`réponse inattendue du script (${r.status})`); }
       if (!rep.ok) throw new Error(rep.erreur || 'refus');
       m.envoye = true;
+      erreurEnvoi = '';
       ecrire(CLE_MESURES, mesures);
       afficher();
     }
   } catch (e) {
     // hors ligne ou script injoignable : on réessaiera
+    erreurEnvoi = !navigator.onLine ? 'hors ligne'
+      : e instanceof TypeError ? 'script injoignable : vérifier « Qui a accès : Tout le monde »'
+      : e.message;
   } finally {
     envoiEnCours = false;
     afficher();

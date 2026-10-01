@@ -1,5 +1,5 @@
 // Réseau d'abord, cache en secours : l'application s'ouvre hors ligne et se met à jour seule.
-const CACHE = 'brouillard-v3';
+const CACHE = 'brouillard-v4';
 const FICHIERS = ['./', 'index.html', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
