@@ -33,6 +33,16 @@ Au premier lancement, iOS demande l'accès à Santé et l'autorisation de joindr
 
 Chaque nom de champ devient automatiquement une colonne du Sheet. Ajouter une donnée plus tard = ajouter une action et un champ, rien à changer ailleurs.
 
+## Piège : « Filter » au lieu de « Find All »
+
+Quand on ajoute une deuxième action de recherche sous la première, Raccourcis la branche sur le résultat de la précédente. Son titre devient **Filter Health Samples where…** et elle renvoie du vide : la colonne se crée dans le Sheet, sans valeur.
+
+Correction : toucher la pastille **Health Samples** dans le titre de l'action, puis **Clear Variable**. Le titre doit dire **Find All Health Samples where…**. À vérifier pour chaque donnée ajoutée.
+
+Un seul raccourci suffit : une action de recherche par donnée, puis une seule action **Get Contents of URL** avec un champ par donnée, à côté de `id`.
+
+Lancé à la main (▶), le raccourci répond « id manquant » : c'est normal, il n'a pas de mesure à compléter.
+
 ## Limites connues
 
 - La valeur lue est le **dernier échantillon enregistré** par la montre, pas une mesure prise à l'instant.

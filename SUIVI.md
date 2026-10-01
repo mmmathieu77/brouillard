@@ -3,7 +3,6 @@
 ## À faire
 **18** (à toi) Recoller `google-sheet/Code.gs` dans Apps Script et redéployer en « New version » pour recevoir les colonnes Familles et Émotions · ouvert en M12
 **19** (à toi) Réviser la famille Colère dans la taxonomie (non validée dans la V0, intégrée telle quelle) · ouvert en M12
-**10** (à toi) Ajouter les autres données de santé au Raccourci selon `raccourci/RACCOURCI.md` · Raccourci monté avec FC en M10
 **14** (à toi) Retour après le Raccourci : ajouter l'action « Go to Home Screen » en fin de Raccourci · ouvert en M10
 
 ## À tester par Mathieu
@@ -13,6 +12,7 @@
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
+**10** Raccourci santé avec plusieurs données (FC, HRV) : fonctionne, confirmé par Mathieu en M15 ; piège « Filter » au lieu de « Find All » documenté
 **20** Émotions choisies visibles sous le menu · livré en M13, accepté par Mathieu en M14
 **21** Cadran au pouce sur deux axes · livré en M13, accepté en M14
 **22** Annulation d'une mesure en attente · livré en M13, accepté en M14
