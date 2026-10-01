@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Brouillard</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Brouillard">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14171c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root {
+    --fond: #14171c; --carte: #1e232b; --texte: #eef1f5; --doux: #8b95a5;
+    --accent: #9fb8d9; --ok: #7fcf9a; --attente: #e0b060; --trait: #2c333e;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --fond: #f2f4f7; --carte: #ffffff; --texte: #1a1e25; --doux: #6a7484;
+            --accent: #3f6ea8; --ok: #2e8f55; --attente: #b07a10; --trait: #dde2e9; }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--fond); color: var(--texte);
+    font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: calc(env(safe-area-inset-top) + 12px) 20px calc(env(safe-area-inset-bottom) + 16px);
+    display: flex; flex-direction: column; gap: 18px;
+    max-width: 520px; margin: 0 auto; overscroll-behavior: none;
+  }
+  header { display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 17px; font-weight: 600; margin: 0; color: var(--doux); letter-spacing: .02em; }
+  .icone { background: none; border: 0; color: var(--doux); font-size: 24px; padding: 6px 4px; }
+  #valeur { font-size: 128px; font-weight: 200; text-align: center; line-height: 1;
+            font-variant-numeric: tabular-nums; margin: 8px 0 0; }
+  .echelle { display: flex; justify-content: space-between; color: var(--doux); font-size: 14px; padding: 0 4px; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 56px; background: transparent; margin: 0; }
+  input[type=range]::-webkit-slider-runnable-track { height: 10px; border-radius: 5px; background: var(--trait); }
+  input[type=range]::-moz-range-track { height: 10px; border-radius: 5px; background: var(--trait); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); border: 0; margin-top: -17px; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+  input[type=range]::-moz-range-thumb { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); border: 0; }
+  button.principal { width: 100%; padding: 18px; font-size: 19px; font-weight: 600; border: 0; border-radius: 16px;
+    background: var(--accent); color: var(--fond); }
+  button.principal:active { opacity: .8; }
+  button.secondaire { width: 100%; padding: 13px; font-size: 16px; border: 1px solid var(--trait); border-radius: 12px;
+    background: transparent; color: var(--texte); }
+  #etat { text-align: center; font-size: 14px; color: var(--doux); min-height: 20px; }
+  #liste { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; min-height: 0;
+    background: var(--carte); border-radius: 16px; }
+  #liste li { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--trait);
+    font-variant-numeric: tabular-nums; }
+  #liste li:last-child { border-bottom: 0; }
+  #liste .v { font-size: 20px; font-weight: 600; width: 44px; }
+  #liste .t { flex: 1; color: var(--doux); font-size: 15px; min-width: 0; }
+  #liste .n { display: block; color: var(--texte); overflow-wrap: anywhere; }
+  #note { background: var(--carte); }
+  .pastille { width: 9px; height: 9px; border-radius: 50%; background: var(--attente); }
+  .pastille.ok { background: var(--ok); }
+  #vide { color: var(--doux); text-align: center; padding: 22px; font-size: 15px; }
+  dialog { border: 0; border-radius: 18px; background: var(--carte); color: var(--texte); width: min(92vw, 460px); padding: 22px; }
+  dialog::backdrop { background: rgba(0,0,0,.55); }
+  dialog h2 { margin: 0 0 14px; font-size: 19px; }
+  dialog label { display: block; font-size: 14px; color: var(--doux); margin: 14px 0 6px; }
+  #note, dialog input[type=url], dialog input[type=text], dialog select { width: 100%; padding: 12px; font-size: 16px; border-radius: 10px;
+    border: 1px solid var(--trait); background: var(--fond); color: var(--texte); }
+  dialog .rangee { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Brouillard</h1>
+    <button class="icone" id="ouvrirReglages" aria-label="Réglages">⚙︎</button>
+  </header>
+
+  <div>
+    <div id="valeur">5</div>
+    <input type="range" id="gradateur" min="0" max="10" step="1" value="5" aria-label="Valeur de 0 à 10">
+    <div class="echelle"><span>0</span><span>10</span></div>
+  </div>
+
+  <input type="text" id="note" placeholder="Note (facultatif)" autocomplete="off" enterkeyhint="done">
+
+  <button class="principal" id="enregistrer">Enregistrer</button>
+  <div id="etat"></div>
+
+  <ul id="liste"></ul>
+
+  <dialog id="reglages">
+    <h2>Réglages</h2>
+    <label for="url">Adresse du script Google Sheet</label>
+    <input type="url" id="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off">
+    <label for="raccourci">Raccourci santé à lancer après Enregistrer (vide = aucun)</label>
+    <input type="text" id="raccourci" placeholder="Brouillard Santé" autocomplete="off">
+    <label for="pas">Finesse du gradateur</label>
+    <select id="pas">
+      <option value="1">11 valeurs (0, 1, 2 … 10)</option>
+      <option value="0.5">21 valeurs (pas de 0,5)</option>
+      <option value="0.1">101 valeurs (pas de 0,1)</option>
+    </select>
+    <div class="rangee">
+      <button class="principal" id="fermerReglages">OK</button>
+      <button class="secondaire" id="exporter">Exporter en CSV</button>
+    </div>
+  </dialog>
+
+<script>
+const CLE_CFG = 'brouillard.cfg', CLE_MESURES = 'brouillard.mesures';
+const $ = id => document.getElementById(id);
+
+const lire = (cle, defaut) => { try { return JSON.parse(localStorage.getItem(cle)) ?? defaut; } catch { return defaut; } };
+const ecrire = (cle, v) => { try { localStorage.setItem(cle, JSON.stringify(v)); } catch {} };
+
+let cfg = { url: '', pas: 1, raccourci: '', ...lire(CLE_CFG, {}) };
+let mesures = lire(CLE_MESURES, []);   // { id, iso, valeur, note, envoye }
+let envoiEnCours = false;
+
+// Heure locale exacte avec décalage, ex. 2026-10-01T09:18:42.123-04:00
+function isoLocal(d) {
+  const p = (n, l = 2) => String(n).padStart(l, '0');
+  const dec = -d.getTimezoneOffset(), s = dec >= 0 ? '+' : '-', a = Math.abs(dec);
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${p(d.getMilliseconds(), 3)}${s}${p(a / 60 | 0)}:${p(a % 60)}`;
+}
+
+const afficherValeur = v => String(v).replace('.', ',');
+
+function appliquerPas() {
+  const g = $('gradateur');
+  g.step = cfg.pas;
+  $('valeur').textContent = afficherValeur(Number(g.value));
+}
+
+function afficher() {
+  const ul = $('liste');
+  ul.innerHTML = '';
+  if (!mesures.length) { ul.innerHTML = '<li id="vide">Aucune mesure pour l’instant</li>'; }
+  for (const m of mesures.slice(-50).reverse()) {
+    const d = new Date(m.iso), li = document.createElement('li');
+    const quand = d.toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' }) + ' · ' +
+                  [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => String(n).padStart(2, '0')).join(':');
+    li.innerHTML = `<span class="v">${afficherValeur(m.valeur)}</span><span class="t">${quand}</span><span class="pastille ${m.envoye ? 'ok' : ''}"></span>`;
+    if (m.note) {
+      const n = document.createElement('span');
+      n.className = 'n';
+      n.textContent = m.note;
+      li.querySelector('.t').appendChild(n);
+    }
+    ul.appendChild(li);
+  }
+  const attente = mesures.filter(m => !m.envoye).length;
+  $('etat').textContent = !cfg.url ? 'Google Sheet non configuré (⚙︎). Les mesures restent sur le téléphone.'
+    : attente ? `${attente} mesure${attente > 1 ? 's' : ''} en attente d’envoi`
+    : mesures.length ? 'Tout est dans le Google Sheet' : '';
+}
+
+async function synchroniser() {
+  if (envoiEnCours || !cfg.url) return;
+  envoiEnCours = true;
+  try {
+    for (const m of mesures) {
+      if (m.envoye) continue;
+      // text/plain évite la pré-vérification CORS, qu'Apps Script ne gère pas
+      const r = await fetch(cfg.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ id: m.id, iso: m.iso, valeur: m.valeur, note: m.note || '' }),
+      });
+      const rep = await r.json();
+      if (!rep.ok) throw new Error(rep.erreur || 'refus');
+      m.envoye = true;
+      ecrire(CLE_MESURES, mesures);
+      afficher();
+    }
+  } catch (e) {
+    // hors ligne ou script injoignable : on réessaiera
+  } finally {
+    envoiEnCours = false;
+    afficher();
+  }
+}
+
+$('gradateur').addEventListener('input', e => { $('valeur').textContent = afficherValeur(Number(e.target.value)); });
+
+$('enregistrer').addEventListener('click', () => {
+  const maintenant = new Date();
+  const id = maintenant.getTime().toString(36) + Math.random().toString(36).slice(2, 8);
+  mesures.push({
+    id,
+    iso: isoLocal(maintenant),
+    valeur: Number($('gradateur').value),
+    note: $('note').value.trim(),
+    envoye: false,
+  });
+  $('note').value = '';
+  $('note').blur();
+  ecrire(CLE_MESURES, mesures);
+  if (navigator.vibrate) navigator.vibrate(30);
+  const b = $('enregistrer');
+  b.textContent = 'Enregistré ✓';
+  setTimeout(() => { b.textContent = 'Enregistrer'; }, 1200);
+  afficher();
+  synchroniser();
+  // Le Raccourci lit Santé et complète la même ligne du Sheet, retrouvée par l'id
+  if (cfg.raccourci) {
+    location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent(cfg.raccourci) + '&input=text&text=' + id;
+  }
+});
+
+$('ouvrirReglages').addEventListener('click', () => {
+  $('url').value = cfg.url;
+  $('pas').value = String(cfg.pas);
+  $('raccourci').value = cfg.raccourci;
+  $('reglages').showModal();
+});
+
+$('fermerReglages').addEventListener('click', () => {
+  cfg = { url: $('url').value.trim(), pas: Number($('pas').value), raccourci: $('raccourci').value.trim() };
+  ecrire(CLE_CFG, cfg);
+  $('reglages').close();
+  appliquerPas();
+  afficher();
+  synchroniser();
+});
+
+$('exporter').addEventListener('click', () => {
+  const guillemets = t => `"${String(t || '').replace(/"/g, '""')}"`;
+  const lignes = ['horodatage,valeur,note,id', ...mesures.map(m => `${m.iso},${m.valeur},${guillemets(m.note)},${m.id}`)];
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lignes.join('\n')], { type: 'text/csv' }));
+  a.download = 'brouillard.csv';
+  a.click();
+});
+
+window.addEventListener('online', synchroniser);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) synchroniser(); });
+
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js');
+
+appliquerPas();
+afficher();
+synchroniser();
+</script>
+</body>
+</html>
