@@ -22,18 +22,19 @@
             --accent: #3f6ea8; --ok: #2e8f55; --attente: #b07a10; --trait: #dde2e9; }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; margin: 0; }
+  html, body { min-height: 100%; margin: 0; }
+  html { height: 100%; }
   body {
     background: var(--fond); color: var(--texte);
     font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     padding: calc(env(safe-area-inset-top) + 12px) 20px calc(env(safe-area-inset-bottom) + 16px);
-    display: flex; flex-direction: column; gap: 18px;
+    display: flex; flex-direction: column; gap: 14px;
     max-width: 520px; margin: 0 auto; overscroll-behavior: none;
   }
   header { display: flex; justify-content: space-between; align-items: center; }
   header h1 { font-size: 17px; font-weight: 600; margin: 0; color: var(--doux); letter-spacing: .02em; }
   .icone { background: none; border: 0; color: var(--doux); font-size: 24px; padding: 6px 4px; }
-  #cadran { display: block; width: min(76vw, 300px); margin: 0 auto; touch-action: none; outline: none;
+  #cadran { display: block; width: min(62vw, 240px); margin: 0 auto; touch-action: none; outline: none;
     -webkit-user-select: none; user-select: none; }
   #cadran path { fill: none; stroke-width: 14; stroke-linecap: round; }
   #piste { stroke: var(--trait); }
@@ -50,6 +51,15 @@
     background: transparent; color: var(--texte); }
   #etat { text-align: center; font-size: 14px; color: var(--doux); min-height: 20px; }
   #note { background: var(--carte); }
+  #familles { display: flex; gap: 6px; }
+  .famille, .sous { border: 1.5px solid var(--c); border-radius: 999px; background: transparent; color: var(--texte);
+    font: inherit; line-height: 1.2; }
+  .famille { flex: 1 1 0; min-width: 0; padding: 9px 0; font-size: 12.5px; font-weight: 600; }
+  .famille.ouverte { background: color-mix(in srgb, var(--c) 24%, transparent); }
+  #sous { display: flex; flex-wrap: wrap; gap: 8px; }
+  #sous:empty { display: none; }
+  .sous { padding: 8px 13px; font-size: 15px; }
+  .famille.choisie, .sous.choisie { background: var(--c); color: #14171c; }
   #traces { list-style: none; margin: auto 0 0; padding: 0; font-size: 12px; color: var(--doux); opacity: .8;
     font-variant-numeric: tabular-nums; }
   #traces li { display: flex; align-items: center; gap: 7px; line-height: 1.7; }
@@ -80,6 +90,9 @@
     <text x="62" y="278">0</text>
     <text x="238" y="278">10</text>
   </svg>
+
+  <div id="familles" role="group" aria-label="Familles d'émotions"></div>
+  <div id="sous" role="group" aria-label="Émotions"></div>
 
   <input type="text" id="note" placeholder="Note (facultatif)" autocomplete="off" enterkeyhint="done">
 
@@ -114,7 +127,7 @@ const lire = (cle, defaut) => { try { return JSON.parse(localStorage.getItem(cle
 const ecrire = (cle, v) => { try { localStorage.setItem(cle, JSON.stringify(v)); } catch {} };
 
 let cfg = { url: '', pas: 1, raccourci: '', ...lire(CLE_CFG, {}) };
-let mesures = lire(CLE_MESURES, []);   // { id, iso, valeur, note, envoye }
+let mesures = lire(CLE_MESURES, []);   // { id, iso, valeur, familles, emotions, note, envoye }
 let envoiEnCours = false, erreurEnvoi = '';
 
 // Heure locale exacte avec décalage, ex. 2026-10-01T09:18:42.123-04:00
@@ -182,6 +195,61 @@ function initialiserCadran() {
   });
 }
 
+// Émotions : 5 familles, puis leurs sous-familles (reference/Taxonomie_Emotions_V0.md).
+// Les noms de sous-familles sont uniques d'une famille à l'autre.
+const TAXONOMIE = [
+  { nom: 'Joie', couleur: '#e3b23c', sous: ['Émerveillement', 'Enthousiasme', 'Contentement', 'Amusement', 'Fierté', 'Espoir'] },
+  { nom: 'Amour', couleur: '#e0679a', sous: ['Tendresse', 'Passion', 'Gratitude', 'Compassion', 'Appartenance', 'Confiance'] },
+  { nom: 'Tristesse', couleur: '#7f9ec4', sous: ['Mélancolie', 'Perte', 'Solitude', 'Découragement', 'Déception', 'Détresse'] },
+  { nom: 'Peur', couleur: '#9a7bd0', sous: ['Inquiétude', 'Anxiété', 'Frayeur', 'Vulnérabilité', 'Confusion', 'Méfiance'] },
+  { nom: 'Colère', couleur: '#dc5a52', sous: ['Irritation', 'Frustration', 'Rage', 'Indignation', 'Ressentiment', 'Dégoût', 'Envie'] },
+];
+const emotionsChoisies = new Set();
+let familleOuverte = null;
+
+// Dans l'ordre de la taxonomie, pas dans l'ordre des touchers
+const choixEmotions = () => {
+  const emotions = [], familles = [];
+  for (const f of TAXONOMIE) {
+    const prises = f.sous.filter(e => emotionsChoisies.has(e));
+    if (prises.length) { familles.push(f.nom); emotions.push(...prises); }
+  }
+  return { familles, emotions };
+};
+
+function afficherEmotions() {
+  const zoneF = $('familles'), zoneS = $('sous');
+  zoneF.innerHTML = '';
+  zoneS.innerHTML = '';
+  const pastille = (classe, texte, f, choisie, action) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = classe + (choisie ? ' choisie' : '');
+    b.style.setProperty('--c', f.couleur);
+    b.textContent = texte;
+    b.setAttribute('aria-pressed', choisie);
+    b.addEventListener('click', action);
+    return b;
+  };
+  for (const f of TAXONOMIE) {
+    const b = pastille('famille', f.nom, f, f.sous.some(e => emotionsChoisies.has(e)),
+      () => { familleOuverte = familleOuverte === f ? null : f; afficherEmotions(); });
+    if (f === familleOuverte) b.classList.add('ouverte');
+    zoneF.appendChild(b);
+  }
+  // Famille ouverte : toutes ses sous-familles. Aucune ouverte : le rappel de ce qui est choisi.
+  for (const f of familleOuverte ? [familleOuverte] : TAXONOMIE) {
+    for (const e of f.sous) {
+      const choisie = emotionsChoisies.has(e);
+      if (!familleOuverte && !choisie) continue;
+      zoneS.appendChild(pastille('sous', e, f, choisie, () => {
+        choisie ? emotionsChoisies.delete(e) : emotionsChoisies.add(e);
+        afficherEmotions();
+      }));
+    }
+  }
+}
+
 // Traces discrètes : quand ont eu lieu les trois derniers dépôts, et s'ils sont partis
 function afficher() {
   const ul = $('traces');
@@ -210,7 +278,10 @@ async function synchroniser() {
       const r = await fetch(cfg.url, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ id: m.id, iso: m.iso, valeur: m.valeur, note: m.note || '' }),
+        body: JSON.stringify({
+          id: m.id, iso: m.iso, valeur: m.valeur, note: m.note || '',
+          familles: (m.familles || []).join(', '), emotions: (m.emotions || []).join(', '),
+        }),
       });
       const texte = await r.text();
       let rep;
@@ -239,11 +310,15 @@ $('enregistrer').addEventListener('click', () => {
     id,
     iso: isoLocal(maintenant),
     valeur,
+    ...choixEmotions(),
     note: $('note').value.trim(),
     envoye: false,
   });
   $('note').value = '';
   $('note').blur();
+  emotionsChoisies.clear();
+  familleOuverte = null;
+  afficherEmotions();
   ecrire(CLE_MESURES, mesures);
   if (navigator.vibrate) navigator.vibrate(30);
   const b = $('enregistrer');
@@ -275,7 +350,9 @@ $('fermerReglages').addEventListener('click', () => {
 
 $('exporter').addEventListener('click', () => {
   const guillemets = t => `"${String(t || '').replace(/"/g, '""')}"`;
-  const lignes = ['horodatage,valeur,note,id', ...mesures.map(m => `${m.iso},${m.valeur},${guillemets(m.note)},${m.id}`)];
+  const liste = l => guillemets((l || []).join(', '));
+  const lignes = ['horodatage,valeur,familles,emotions,note,id',
+    ...mesures.map(m => `${m.iso},${m.valeur},${liste(m.familles)},${liste(m.emotions)},${guillemets(m.note)},${m.id}`)];
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([lignes.join('\n')], { type: 'text/csv' }));
   a.download = 'brouillard.csv';
@@ -289,6 +366,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.se
 
 initialiserCadran();
 reglerValeur(valeur);
+afficherEmotions();
 afficher();
 synchroniser();
 </script>
