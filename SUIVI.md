@@ -7,16 +7,16 @@
 **14** (à toi) Retour après le Raccourci : ajouter l'action « Go to Home Screen » en fin de Raccourci · ouvert en M10
 
 ## À tester par Mathieu
-**20** Émotions choisies toujours visibles sous le menu, au-dessus de la note · livré en M13
-**21** Cadran au pouce : glisser vers le haut ou la droite monte, vers le bas ou la gauche descend, les deux axes s'additionnent · livré en M13
-**22** Annulation d'une mesure en attente : « × » à côté de sa trace orange · livré en M13
-**24** Bas d'écran : Enregistrer aux deux tiers à gauche, trois dernières traces à droite · livré en M13
+**26** Liste élargie à 79 émotions, dont un sixième groupe « Entre-deux » (calme, neutre, confusion, honte…) · livré en M14, liste à valider dans `reference/Liste_Emotions_Application.md`
 
 ## En attente de décision de Mathieu
-**26** Plus de choix d'émotions : descendre jusqu'aux émotions précises, et sous quelle forme · posé en M13
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
+**20** Émotions choisies visibles sous le menu · livré en M13, accepté par Mathieu en M14
+**21** Cadran au pouce sur deux axes · livré en M13, accepté en M14
+**22** Annulation d'une mesure en attente · livré en M13, accepté en M14
+**24** Bas d'écran : Enregistrer à gauche, traces à droite · livré en M13, accepté en M14
 **15** Cadran circulaire · livré en M11, confirmé par Mathieu en M13
 **16** Traces discrètes des trois derniers dépôts · livré en M11, confirmé en M13
 **17** Choix d'émotions par familles et sous-familles · livré en M12, confirmé en M13

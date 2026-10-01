@@ -14,6 +14,7 @@ Application web installable sur téléphone : un gradateur de 0 à 10, un bouton
 - L'URL du script Google n'est jamais écrite dans le code : elle se saisit dans les réglages de l'application et reste dans le téléphone.
 - Toute mesure est d'abord écrite localement, puis envoyée. Une mesure n'est jamais perdue faute de réseau.
 - Après un changement dans `app/`, incrémenter `CACHE` dans `app/sw.js`.
+- La liste des émotions vit dans la constante `TAXONOMIE` de `app/index.html`. Sa version lisible et les choix à valider sont dans `reference/Liste_Emotions_Application.md` : tenir les deux alignées.
 
 ## Publication
 

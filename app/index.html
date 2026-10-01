@@ -50,18 +50,19 @@
   button.secondaire { width: 100%; padding: 13px; font-size: 16px; border: 1px solid var(--trait); border-radius: 12px;
     background: transparent; color: var(--texte); }
   #note { background: var(--carte); }
-  #familles { display: flex; gap: 6px; }
+  #familles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .famille, .sous { border: 1.5px solid var(--c); border-radius: 999px; background: transparent; color: var(--texte);
     font: inherit; line-height: 1.2; }
-  .famille { flex: 1 1 0; min-width: 0; padding: 9px 0; font-size: 12.5px; font-weight: 600; }
+  .famille { min-width: 0; padding: 8px 0; font-size: 14px; font-weight: 600; }
   .famille.ouverte { background: color-mix(in srgb, var(--c) 24%, transparent); }
-  #sous, #choisies { display: flex; flex-wrap: wrap; gap: 8px; }
+  #sous, #choisies { display: flex; flex-wrap: wrap; gap: 6px; }
   #sous:empty, #choisies:empty { display: none; }
   #choisies { gap: 6px; }
   #choisies .sous { padding: 6px 11px; font-size: 13px; }
-  .sous { padding: 8px 13px; font-size: 15px; }
+  .sous { padding: 7px 11px; font-size: 14px; }
   .famille.choisie, .sous.choisie { background: var(--c); color: #14171c; }
-  #bas { display: flex; align-items: center; gap: 14px; margin-top: auto; }
+  #bas { display: flex; align-items: center; gap: 14px; margin-top: auto; position: sticky;
+    bottom: calc(env(safe-area-inset-bottom) + 16px); background: var(--fond); box-shadow: 0 0 0 16px var(--fond); }
   #bas .principal { flex: 0 0 66%; width: auto; }
   #traces { list-style: none; margin: 0; padding: 0; flex: 1; min-width: 0; font-size: 11px; color: var(--doux);
     font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -213,14 +214,22 @@ function initialiserCadran() {
   });
 }
 
-// Émotions : 5 familles, puis leurs sous-familles (reference/Taxonomie_Emotions_V0.md).
-// Les noms de sous-familles sont uniques d'une famille à l'autre.
+// Émotions proposées, par famille. Liste de travail tirée de reference/Taxonomie_Emotions_V0.md :
+// sous-familles et émotions les plus courantes, plus un groupe « Entre-deux » pour les états neutres
+// et les zones mitoyennes. Chaque nom n'apparaît qu'une fois.
 const TAXONOMIE = [
-  { nom: 'Joie', couleur: '#e3b23c', sous: ['Émerveillement', 'Enthousiasme', 'Contentement', 'Amusement', 'Fierté', 'Espoir'] },
-  { nom: 'Amour', couleur: '#e0679a', sous: ['Tendresse', 'Passion', 'Gratitude', 'Compassion', 'Appartenance', 'Confiance'] },
-  { nom: 'Tristesse', couleur: '#7f9ec4', sous: ['Mélancolie', 'Perte', 'Solitude', 'Découragement', 'Déception', 'Détresse'] },
-  { nom: 'Peur', couleur: '#9a7bd0', sous: ['Inquiétude', 'Anxiété', 'Frayeur', 'Vulnérabilité', 'Confusion', 'Méfiance'] },
-  { nom: 'Colère', couleur: '#dc5a52', sous: ['Irritation', 'Frustration', 'Rage', 'Indignation', 'Ressentiment', 'Dégoût', 'Envie'] },
+  { nom: 'Joie', couleur: '#e3b23c', emotions: ['Émerveillement', 'Enthousiasme', 'Excitation', 'Contentement', 'Sérénité', 'Bien-être',
+    'Amusement', 'Plaisir', 'Fierté', 'Accomplissement', 'Espoir', 'Inspiration', 'Motivation'] },
+  { nom: 'Amour', couleur: '#e0679a', emotions: ['Tendresse', 'Affection', 'Se sentir aimé', 'Passion', 'Désir', 'Gratitude',
+    'Être touché', 'Compassion', 'Empathie', 'Appartenance', 'Complicité', 'Confiance', 'Sécurité'] },
+  { nom: 'Tristesse', couleur: '#7f9ec4', emotions: ['Mélancolie', 'Nostalgie', 'Chagrin', 'Manque', 'Solitude', 'Isolement',
+    'Découragement', 'Lassitude', 'Épuisement', 'Déception', 'Regret', 'Détresse', 'Vide'] },
+  { nom: 'Peur', couleur: '#9a7bd0', emotions: ['Inquiétude', 'Appréhension', 'Nervosité', 'Anxiété', 'Stress', 'Rumination',
+    'Frayeur', 'Panique', 'Vulnérabilité', 'Insécurité', 'Gêne', 'Doute', 'Méfiance'] },
+  { nom: 'Colère', couleur: '#dc5a52', emotions: ['Irritation', 'Agacement', 'Impatience', 'Frustration', 'Impuissance', 'Colère',
+    'Rage', 'Indignation', 'Injustice', 'Ressentiment', 'Amertume', 'Dégoût', 'Jalousie'] },
+  { nom: 'Entre-deux', couleur: '#a3adba', emotions: ['Calme', 'Neutre', 'Détachement', 'Ennui', 'Apathie', 'Confusion',
+    'Perplexité', 'Ambivalence', 'Surprise', 'Trac', 'Doux-amer', 'Honte', 'Culpabilité', 'Embarras'] },
 ];
 const emotionsChoisies = new Set();
 let familleOuverte = null;
@@ -229,7 +238,7 @@ let familleOuverte = null;
 const choixEmotions = () => {
   const emotions = [], familles = [];
   for (const f of TAXONOMIE) {
-    const prises = f.sous.filter(e => emotionsChoisies.has(e));
+    const prises = f.emotions.filter(e => emotionsChoisies.has(e));
     if (prises.length) { familles.push(f.nom); emotions.push(...prises); }
   }
   return { familles, emotions };
@@ -250,7 +259,7 @@ function afficherEmotions() {
     return b;
   };
   for (const f of TAXONOMIE) {
-    const b = pastille('famille', f.nom, f, f.sous.some(e => emotionsChoisies.has(e)),
+    const b = pastille('famille', f.nom, f, f.emotions.some(e => emotionsChoisies.has(e)),
       () => { familleOuverte = familleOuverte === f ? null : f; afficherEmotions(); });
     if (f === familleOuverte) b.classList.add('ouverte');
     zoneF.appendChild(b);
@@ -260,13 +269,13 @@ function afficherEmotions() {
     afficherEmotions();
   };
   if (familleOuverte) {
-    for (const e of familleOuverte.sous) zoneS.appendChild(pastille('sous', e, familleOuverte, emotionsChoisies.has(e), basculer(e)));
+    for (const e of familleOuverte.emotions) zoneS.appendChild(pastille('sous', e, familleOuverte, emotionsChoisies.has(e), basculer(e)));
   }
   // Sous le menu : tout ce qui est choisi, toutes familles confondues ; un toucher retire
   const zoneC = $('choisies');
   zoneC.innerHTML = '';
   for (const f of TAXONOMIE) {
-    for (const e of f.sous) if (emotionsChoisies.has(e)) zoneC.appendChild(pastille('sous', e, f, true, basculer(e)));
+    for (const e of f.emotions) if (emotionsChoisies.has(e)) zoneC.appendChild(pastille('sous', e, f, true, basculer(e)));
   }
 }
 
