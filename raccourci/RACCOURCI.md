@@ -37,4 +37,4 @@ Chaque nom de champ devient automatiquement une colonne du Sheet. Ajouter une do
 
 - La valeur lue est le **dernier échantillon enregistré** par la montre, pas une mesure prise à l'instant.
 - Le sommeil n'est pas un simple nombre : il demande un montage à part.
-- Après le Raccourci, il faut revenir à l'application soi-même.
+- Après le Raccourci, l'écran reste sur Raccourcis. Une action finale **Aller à l'écran d'accueil** (Go to Home Screen) évite d'y rester ; une application d'écran d'accueil ne peut pas être rouverte par un Raccourci.

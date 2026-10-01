@@ -1,15 +1,16 @@
 # SUIVI · Mesure brouillard
 
 ## À faire
-**10** (à toi) Monter le Raccourci « Brouillard Santé » sur l'iPhone selon `raccourci/RACCOURCI.md` · ouvert en M3, étapes données en M8
+**10** (à toi) Ajouter les autres données de santé au Raccourci selon `raccourci/RACCOURCI.md` · Raccourci monté avec FC en M10
+**14** (à toi) Retour après le Raccourci : ajouter l'action « Go to Home Screen » en fin de Raccourci · ouvert en M10
 
 ## À tester par Mathieu
-**9** Lancement du Raccourci après Enregistrer et données de santé sur la même ligne du Sheet · livré en M3, non testé sur iPhone, testable après **5** et **10**
 
 ## En attente de décision de Mathieu
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
+**9** Raccourci lancé après Enregistrer, colonne FC remplie sur la ligne de la mesure · confirmé par Mathieu en M10
 **2** Application : mesure et valeurs exactes dans le Sheet, confirmé par Mathieu en M9
 **7** Champ Note · livré en M2, confirmé avec **2** en M9
 **12** Application installée sur l'iPhone, URL collée · fait par Mathieu en M8
