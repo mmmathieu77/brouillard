@@ -1,15 +1,17 @@
 # SUIVI · Mesure brouillard
 
 ## À faire
+**18** (à toi) Recoller `google-sheet/Code.gs` dans Apps Script et redéployer en « New version » pour recevoir les colonnes Familles et Émotions · ouvert en M12
+**19** (à toi) Réviser la famille Colère dans la taxonomie (non validée dans la V0, intégrée telle quelle) · ouvert en M12
 **10** (à toi) Ajouter les autres données de santé au Raccourci selon `raccourci/RACCOURCI.md` · Raccourci monté avec FC en M10
 **14** (à toi) Retour après le Raccourci : ajouter l'action « Go to Home Screen » en fin de Raccourci · ouvert en M10
 
 ## À tester par Mathieu
+**17** Choix d'émotions avant la note : 5 familles, puis sous-familles à cocher (option A), colonnes Familles et Émotions · livré en M12, colonnes testables après **18**
 **15** Cadran circulaire de 0 à 10 à la place du gradateur linéaire · livré en M11
 **16** Traces discrètes en bas : date, heure et statut des trois derniers dépôts, sans valeur ni note · livré en M11
 
 ## En attente de décision de Mathieu
-**17** Choix d'émotions avant la note, d'après `reference/Taxonomie_Emotions_V0.md` : profondeur du choix (familles, sous-familles ou émotions) · posé en M11
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés

@@ -14,7 +14,7 @@
  * L'URL fait office de clé : quiconque la connaît peut ajouter des lignes. Ne pas la publier.
  *
  * Deux types d'envoi, reliés par le même id :
- *   mesure : { id, iso, valeur, note }   (envoyée par la page)
+ *   mesure : { id, iso, valeur, note, familles, emotions }   (envoyée par la page)
  *   santé  : { id, <nom>: <valeur>, … }  (envoyée par le Raccourci ; chaque nom devient une colonne)
  * L'ordre d'arrivée est indifférent.
  */
@@ -52,6 +52,10 @@ function doPost(e) {
         // renvoi après une coupure réseau : pas de doublon
         return reponse({ ok: true, doublon: true });
       }
+      var emotions = {};
+      if (d.familles !== undefined) emotions['Familles'] = String(d.familles);
+      if (d.emotions !== undefined) emotions['Émotions'] = String(d.emotions);
+      ecrireParEntete(f, ligne || f.getLastRow(), emotions);
       return reponse({ ok: true });
     }
 
@@ -59,22 +63,30 @@ function doPost(e) {
       f.appendRow(['', '', '', '', id]);
       ligne = f.getLastRow();
     }
-    var entetes = f.getRange(1, 1, 1, f.getLastColumn()).getValues()[0];
+    var sante = {};
     for (var cle in d) {
-      if (cle === 'id') continue;
-      var col = entetes.indexOf(cle) + 1;
-      if (!col) {
-        entetes.push(cle);
-        col = entetes.length;
-        f.getRange(1, col).setValue(cle);
-      }
-      f.getRange(ligne, col).setValue(nombreSiPossible(d[cle]));
+      if (cle !== 'id') sante[cle] = nombreSiPossible(d[cle]);
     }
+    ecrireParEntete(f, ligne, sante);
     return reponse({ ok: true });
   } catch (err) {
     return reponse({ ok: false, erreur: String(err) });
   } finally {
     try { verrou.releaseLock(); } catch (err) {}
+  }
+}
+
+// Range chaque valeur dans la colonne qui porte son nom, créée au besoin à la suite des autres
+function ecrireParEntete(f, ligne, valeurs) {
+  var entetes = f.getRange(1, 1, 1, f.getLastColumn()).getValues()[0];
+  for (var cle in valeurs) {
+    var col = entetes.indexOf(cle) + 1;
+    if (!col) {
+      entetes.push(cle);
+      col = entetes.length;
+      f.getRange(1, col).setValue(cle);
+    }
+    f.getRange(ligne, col).setValue(valeurs[cle]);
   }
 }
 
