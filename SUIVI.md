@@ -5,8 +5,11 @@
 **14** (à toi) Retour après le Raccourci : ajouter l'action « Go to Home Screen » en fin de Raccourci · ouvert en M10
 
 ## À tester par Mathieu
+**15** Cadran circulaire de 0 à 10 à la place du gradateur linéaire · livré en M11
+**16** Traces discrètes en bas : date, heure et statut des trois derniers dépôts, sans valeur ni note · livré en M11
 
 ## En attente de décision de Mathieu
+**17** Choix d'émotions avant la note, d'après `reference/Taxonomie_Emotions_V0.md` : profondeur du choix (familles, sous-familles ou émotions) · posé en M11
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
