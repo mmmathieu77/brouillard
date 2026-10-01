@@ -49,21 +49,26 @@
   button.principal:active { opacity: .8; }
   button.secondaire { width: 100%; padding: 13px; font-size: 16px; border: 1px solid var(--trait); border-radius: 12px;
     background: transparent; color: var(--texte); }
-  #etat { text-align: center; font-size: 14px; color: var(--doux); min-height: 20px; }
   #note { background: var(--carte); }
   #familles { display: flex; gap: 6px; }
   .famille, .sous { border: 1.5px solid var(--c); border-radius: 999px; background: transparent; color: var(--texte);
     font: inherit; line-height: 1.2; }
   .famille { flex: 1 1 0; min-width: 0; padding: 9px 0; font-size: 12.5px; font-weight: 600; }
   .famille.ouverte { background: color-mix(in srgb, var(--c) 24%, transparent); }
-  #sous { display: flex; flex-wrap: wrap; gap: 8px; }
-  #sous:empty { display: none; }
+  #sous, #choisies { display: flex; flex-wrap: wrap; gap: 8px; }
+  #sous:empty, #choisies:empty { display: none; }
+  #choisies { gap: 6px; }
+  #choisies .sous { padding: 6px 11px; font-size: 13px; }
   .sous { padding: 8px 13px; font-size: 15px; }
   .famille.choisie, .sous.choisie { background: var(--c); color: #14171c; }
-  #traces { list-style: none; margin: auto 0 0; padding: 0; font-size: 12px; color: var(--doux); opacity: .8;
-    font-variant-numeric: tabular-nums; }
-  #traces li { display: flex; align-items: center; gap: 7px; line-height: 1.7; }
-  #traces .pastille { width: 6px; height: 6px; }
+  #bas { display: flex; align-items: center; gap: 14px; margin-top: auto; }
+  #bas .principal { flex: 0 0 66%; width: auto; }
+  #traces { list-style: none; margin: 0; padding: 0; flex: 1; min-width: 0; font-size: 11px; color: var(--doux);
+    font-variant-numeric: tabular-nums; white-space: nowrap; }
+  #traces li { display: flex; align-items: center; gap: 6px; line-height: 1.75; }
+  #traces .pastille { width: 6px; height: 6px; flex: none; }
+  #traces .annuler { border: 0; background: none; color: var(--attente); font: inherit; font-size: 15px; line-height: 1;
+    padding: 0 4px; margin: -2px 0; }
   .pastille { width: 9px; height: 9px; border-radius: 50%; background: var(--attente); }
   .pastille.ok { background: var(--ok); }
   dialog { border: 0; border-radius: 18px; background: var(--carte); color: var(--texte); width: min(92vw, 460px); padding: 22px; }
@@ -93,13 +98,14 @@
 
   <div id="familles" role="group" aria-label="Familles d'émotions"></div>
   <div id="sous" role="group" aria-label="Émotions"></div>
+  <div id="choisies" role="group" aria-label="Émotions choisies"></div>
 
-  <input type="text" id="note" placeholder="Note (facultatif)" autocomplete="off" enterkeyhint="done">
+  <input type="text" id="note" placeholder="Note" autocomplete="off" enterkeyhint="done">
 
-  <button class="principal" id="enregistrer">Enregistrer</button>
-  <div id="etat"></div>
-
-  <ul id="traces" aria-label="Derniers enregistrements"></ul>
+  <footer id="bas">
+    <button class="principal" id="enregistrer">Enregistrer</button>
+    <ul id="traces" aria-label="Derniers enregistrements"></ul>
+  </footer>
 
   <dialog id="reglages">
     <h2>Réglages</h2>
@@ -128,7 +134,7 @@ const ecrire = (cle, v) => { try { localStorage.setItem(cle, JSON.stringify(v));
 
 let cfg = { url: '', pas: 1, raccourci: '', ...lire(CLE_CFG, {}) };
 let mesures = lire(CLE_MESURES, []);   // { id, iso, valeur, familles, emotions, note, envoye }
-let envoiEnCours = false, erreurEnvoi = '';
+let envoiEnCours = false;
 
 // Heure locale exacte avec décalage, ex. 2026-10-01T09:18:42.123-04:00
 function isoLocal(d) {
@@ -141,7 +147,8 @@ const afficherValeur = v => String(v).replace('.', ',');
 
 // Cadran : arc de 270° ouvert vers le bas, 0 en bas à gauche, 10 en bas à droite
 const CX = 150, CY = 150, RAYON = 120, ANGLE0 = 135, BALAYAGE = 270;
-let valeur = 5, glisse = false;
+const PX_PAR_UNITE = 22;   // course du pouce pour un point du cadran
+let valeur = 5, geste = null;
 
 const point = (angle, r = RAYON) => {
   const t = angle * Math.PI / 180;
@@ -167,15 +174,14 @@ function reglerValeur(v) {
   dessinerCadran();
 }
 
-function valeurDuPointeur(e, premierContact) {
+// Un toucher sans glisser sur l'arc place la valeur à cet endroit
+function valeurAuToucher(e) {
   const r = $('cadran').getBoundingClientRect();
   const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+  if (Math.hypot(dx, dy) < r.width * 0.28) return;   // au centre, sur le chiffre : rien
   let rel = (Math.atan2(dy, dx) * 180 / Math.PI - ANGLE0 + 720) % 360;
   if (rel > BALAYAGE) rel = rel > BALAYAGE + (360 - BALAYAGE) / 2 ? 0 : BALAYAGE;   // dans l'ouverture du bas
-  const v = rel / BALAYAGE * 10;
-  // en glissant, on ne saute pas de 10 à 0 en traversant l'ouverture
-  if (!premierContact && Math.abs(v - valeur) > 5) return;
-  reglerValeur(v);
+  reglerValeur(rel / BALAYAGE * 10);
 }
 
 function initialiserCadran() {
@@ -186,9 +192,21 @@ function initialiserCadran() {
     $('reperes').appendChild(c);
   }
   const svg = $('cadran');
-  svg.addEventListener('pointerdown', e => { glisse = true; svg.setPointerCapture(e.pointerId); valeurDuPointeur(e, true); });
-  svg.addEventListener('pointermove', e => { if (glisse) valeurDuPointeur(e, false); });
-  for (const fin of ['pointerup', 'pointercancel']) svg.addEventListener(fin, () => { glisse = false; });
+  // Glisser n'importe où sur le cadran : vers le haut ou la droite monte, vers le bas ou la gauche descend,
+  // les deux axes s'additionnent
+  svg.addEventListener('pointerdown', e => {
+    geste = { x: e.clientX, y: e.clientY, valeur, glisse: false };
+    svg.setPointerCapture(e.pointerId);
+  });
+  svg.addEventListener('pointermove', e => {
+    if (!geste) return;
+    const dx = e.clientX - geste.x, dy = e.clientY - geste.y;
+    if (!geste.glisse && Math.hypot(dx, dy) < 6) return;
+    geste.glisse = true;
+    reglerValeur(geste.valeur + (dx - dy) / PX_PAR_UNITE);
+  });
+  svg.addEventListener('pointerup', e => { if (geste && !geste.glisse) valeurAuToucher(e); geste = null; });
+  svg.addEventListener('pointercancel', () => { geste = null; });
   svg.addEventListener('keydown', e => {
     const sens = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
     if (sens) { e.preventDefault(); reglerValeur(valeur + sens * cfg.pas); }
@@ -237,20 +255,23 @@ function afficherEmotions() {
     if (f === familleOuverte) b.classList.add('ouverte');
     zoneF.appendChild(b);
   }
-  // Famille ouverte : toutes ses sous-familles. Aucune ouverte : le rappel de ce qui est choisi.
-  for (const f of familleOuverte ? [familleOuverte] : TAXONOMIE) {
-    for (const e of f.sous) {
-      const choisie = emotionsChoisies.has(e);
-      if (!familleOuverte && !choisie) continue;
-      zoneS.appendChild(pastille('sous', e, f, choisie, () => {
-        choisie ? emotionsChoisies.delete(e) : emotionsChoisies.add(e);
-        afficherEmotions();
-      }));
-    }
+  const basculer = e => () => {
+    emotionsChoisies.has(e) ? emotionsChoisies.delete(e) : emotionsChoisies.add(e);
+    afficherEmotions();
+  };
+  if (familleOuverte) {
+    for (const e of familleOuverte.sous) zoneS.appendChild(pastille('sous', e, familleOuverte, emotionsChoisies.has(e), basculer(e)));
+  }
+  // Sous le menu : tout ce qui est choisi, toutes familles confondues ; un toucher retire
+  const zoneC = $('choisies');
+  zoneC.innerHTML = '';
+  for (const f of TAXONOMIE) {
+    for (const e of f.sous) if (emotionsChoisies.has(e)) zoneC.appendChild(pastille('sous', e, f, true, basculer(e)));
   }
 }
 
-// Traces discrètes : quand ont eu lieu les trois derniers dépôts, et s'ils sont partis
+// Traces discrètes : quand ont eu lieu les trois derniers dépôts, et s'ils sont partis.
+// Une mesure encore en attente (orange) peut être annulée ; une fois dans le Sheet, elle ne s'efface que là-bas.
 function afficher() {
   const ul = $('traces');
   ul.innerHTML = '';
@@ -259,21 +280,30 @@ function afficher() {
     const quand = d.toLocaleDateString('fr-CA', { day: 'numeric', month: 'short' }) + ' · ' +
                   [d.getHours(), d.getMinutes()].map(n => String(n).padStart(2, '0')).join(':');
     li.innerHTML = `<span class="pastille ${m.envoye ? 'ok' : ''}"></span><span>${quand}</span>`;
+    if (!m.envoye) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'annuler';
+      b.textContent = '×';
+      b.setAttribute('aria-label', 'Annuler cette mesure en attente');
+      b.addEventListener('click', () => {
+        if (m.envoye || !confirm('Annuler cette mesure en attente ?')) return;
+        mesures.splice(mesures.indexOf(m), 1);
+        ecrire(CLE_MESURES, mesures);
+        afficher();
+      });
+      li.appendChild(b);
+    }
     ul.appendChild(li);
   }
-  const attente = mesures.filter(m => !m.envoye).length;
-  $('etat').textContent = !cfg.url ? 'Google Sheet non configuré (⚙︎). Les mesures restent sur le téléphone.'
-    : !/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(cfg.url) ? 'L’adresse du script doit commencer par https://script.google.com/macros/s/ et finir par /exec (⚙︎)'
-    : attente ? `${attente} mesure${attente > 1 ? 's' : ''} en attente d’envoi` + (erreurEnvoi ? ` · ${erreurEnvoi}` : '')
-    : '';
 }
 
 async function synchroniser() {
   if (envoiEnCours || !cfg.url) return;
   envoiEnCours = true;
   try {
-    for (const m of mesures) {
-      if (m.envoye) continue;
+    for (const m of [...mesures]) {
+      if (m.envoye || !mesures.includes(m)) continue;
       // text/plain évite la pré-vérification CORS, qu'Apps Script ne gère pas
       const r = await fetch(cfg.url, {
         method: 'POST',
@@ -288,15 +318,11 @@ async function synchroniser() {
       try { rep = JSON.parse(texte); } catch { throw new Error(`réponse inattendue du script (${r.status})`); }
       if (!rep.ok) throw new Error(rep.erreur || 'refus');
       m.envoye = true;
-      erreurEnvoi = '';
       ecrire(CLE_MESURES, mesures);
       afficher();
     }
   } catch (e) {
-    // hors ligne ou script injoignable : on réessaiera
-    erreurEnvoi = !navigator.onLine ? 'hors ligne'
-      : e instanceof TypeError ? 'script injoignable : vérifier « Qui a accès : Tout le monde »'
-      : e.message;
+    // hors ligne ou script injoignable : la pastille reste orange, on réessaiera
   } finally {
     envoiEnCours = false;
     afficher();

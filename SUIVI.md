@@ -7,14 +7,21 @@
 **14** (à toi) Retour après le Raccourci : ajouter l'action « Go to Home Screen » en fin de Raccourci · ouvert en M10
 
 ## À tester par Mathieu
-**17** Choix d'émotions avant la note : 5 familles, puis sous-familles à cocher (option A), colonnes Familles et Émotions · livré en M12, colonnes testables après **18**
-**15** Cadran circulaire de 0 à 10 à la place du gradateur linéaire · livré en M11
-**16** Traces discrètes en bas : date, heure et statut des trois derniers dépôts, sans valeur ni note · livré en M11
+**20** Émotions choisies toujours visibles sous le menu, au-dessus de la note · livré en M13
+**21** Cadran au pouce : glisser vers le haut ou la droite monte, vers le bas ou la gauche descend, les deux axes s'additionnent · livré en M13
+**22** Annulation d'une mesure en attente : « × » à côté de sa trace orange · livré en M13
+**24** Bas d'écran : Enregistrer aux deux tiers à gauche, trois dernières traces à droite · livré en M13
 
 ## En attente de décision de Mathieu
+**26** Plus de choix d'émotions : descendre jusqu'aux émotions précises, et sous quelle forme · posé en M13
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
+**15** Cadran circulaire · livré en M11, confirmé par Mathieu en M13
+**16** Traces discrètes des trois derniers dépôts · livré en M11, confirmé en M13
+**17** Choix d'émotions par familles et sous-familles · livré en M12, confirmé en M13
+**23** Textes d'état retirés (la pastille suffit), champ renommé « Note » · fait en M13
+**25** Champ de contexte (où, avec qui, à propos de quoi) : écarté, le contexte va dans la note · décidé en M13
 **9** Raccourci lancé après Enregistrer, colonne FC remplie sur la ligne de la mesure · confirmé par Mathieu en M10
 **2** Application : mesure et valeurs exactes dans le Sheet, confirmé par Mathieu en M9
 **7** Champ Note · livré en M2, confirmé avec **2** en M9
