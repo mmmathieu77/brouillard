@@ -1,6 +1,8 @@
 # SUIVI · Mesure brouillard
 
 ## À faire
+**30** (à toi) Raccourci, recette 1 : ajouter FC repos, Respiration, SpO2, Temp poignet, Perturb resp selon `raccourci/RACCOURCI.md`, et signaler les types introuvables · ouvert en M18
+**31** (à toi) Raccourci, recette 2 : ajouter Pas, Exercice min, Lumière min (cumul du jour) et vérifier que la cellule contient un seul nombre · ouvert en M18
 **27** (à toi) Essai du sommeil profond dans le Raccourci (durées par tranche), pour que j'ajuste l'addition côté script · ouvert en M16
 **18** (à toi) Recoller `google-sheet/Code.gs` dans Apps Script et redéployer en « New version » pour recevoir les colonnes Familles et Émotions · ouvert en M12
 **19** (à toi) Réviser la famille Colère dans la taxonomie (non validée dans la V0, intégrée telle quelle) · ouvert en M12
@@ -10,11 +12,12 @@
 **26** Liste élargie à 79 émotions, dont un sixième groupe « Entre-deux » (calme, neutre, confusion, honte…) · livré en M14, liste à valider dans `reference/Liste_Emotions_Application.md`
 
 ## En attente de décision de Mathieu
-**29** Deux raccourcis (un quotidien vers un onglet « Jours », un par mesure) plutôt qu'un seul · posé en M17
-**28** Liste des 20 paramètres de santé : appréciation rendue en M17 dans `raccourci/PARAMETRES_SANTE.md`, liste finale à arrêter
+**32** Saisies manuelles dans l'application (caféine, alcool, médicaments, repas) : sous quelle forme · posé en M18, à traiter après le raccourci
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
+**29** Un seul raccourci : tout est capturé à chaque mesure, et l'analyse ne garde qu'une valeur par jour pour les données quotidiennes · décidé par Mathieu en M18
+**28** Paramètres de santé : tout ce qui est lisible est capturé ; Vitals, Sleep Score, State of Mind et FC pendant le sommeil sont écartés · arrêté en M18
 **10** Raccourci santé avec plusieurs données (FC, HRV) : fonctionne, confirmé par Mathieu en M15 ; piège « Filter » au lieu de « Find All » documenté
 **20** Émotions choisies visibles sous le menu · livré en M13, accepté par Mathieu en M14
 **21** Cadran au pouce sur deux axes · livré en M13, accepté en M14

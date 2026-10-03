@@ -48,8 +48,8 @@ Les valeurs de la montre sont des estimations, pas des mesures cliniques.
 - Il faut du volume avant de conclure : trois ou quatre mesures par jour pendant au moins quatre semaines.
 - Commencer par le noyau (1, 2, 7, 8, 4, 5, 18, perturbations respiratoires), ajouter le reste ensuite.
 
-## Répartition proposée
+## Décision du 3 octobre 2026
 
-- **Raccourci quotidien** (automatique, le matin) : 1, 2, 3, 4, 5, 6, 7 (moyenne de nuit), 8, perturbations respiratoires, et les totaux de la veille pour 12, 13, 14.
-- **Raccourci par mesure** (actuel) : FC et HRV du moment, pas, exercice et lumière cumulés depuis le matin.
-- **Dans l'application** : caféine, alcool, médicaments, repas.
+- Mathieu retient un **seul raccourci** : tout est capturé à chaque mesure.
+- Les données quotidiennes se répètent donc sur les lignes d'une même journée. À l'analyse, on n'en garde qu'une valeur par jour, sans quoi une nuit compterait autant de fois qu'il y a de mesures ce jour-là.
+- Le montage exact est dans `RACCOURCI.md`.
