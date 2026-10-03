@@ -1,6 +1,7 @@
 # SUIVI · Mesure brouillard
 
 ## À faire
+**27** (à toi) Essai du sommeil profond dans le Raccourci (durées par tranche), pour que j'ajuste l'addition côté script · ouvert en M16
 **18** (à toi) Recoller `google-sheet/Code.gs` dans Apps Script et redéployer en « New version » pour recevoir les colonnes Familles et Émotions · ouvert en M12
 **19** (à toi) Réviser la famille Colère dans la taxonomie (non validée dans la V0, intégrée telle quelle) · ouvert en M12
 **14** (à toi) Retour après le Raccourci : ajouter l'action « Go to Home Screen » en fin de Raccourci · ouvert en M10
@@ -9,6 +10,8 @@
 **26** Liste élargie à 79 émotions, dont un sixième groupe « Entre-deux » (calme, neutre, confusion, honte…) · livré en M14, liste à valider dans `reference/Liste_Emotions_Application.md`
 
 ## En attente de décision de Mathieu
+**29** Deux raccourcis (un quotidien vers un onglet « Jours », un par mesure) plutôt qu'un seul · posé en M17
+**28** Liste des 20 paramètres de santé : appréciation rendue en M17 dans `raccourci/PARAMETRES_SANTE.md`, liste finale à arrêter
 **11** Version iOS native (option C), seule voie pour afficher les données de santé dans l'écran ; Mathieu a déjà Xcode et un compte développeur · en réserve depuis M3
 
 ## Réglés
